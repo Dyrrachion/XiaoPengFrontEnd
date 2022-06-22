@@ -1,6 +1,6 @@
 # xiaopengfrontend
 
-> A Vue.js project
+> 部署后访问 http://localhost:9990/
 
 ## Build Setup
 
@@ -8,7 +8,7 @@
 # install dependencies
 npm install
 
-# serve with hot reload at localhost:8080
+# serve with hot reload at localhost:9990
 npm run dev
 
 # build for production with minification
