@@ -19,6 +19,7 @@ export default {
     handleCommand(command) {
       if (command === 'signOut')
       {
+        this.$cookie.delCookie("uid");
         this.$router.push('/login');
       }
     }

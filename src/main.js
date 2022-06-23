@@ -8,8 +8,11 @@ import ElementUI from 'element-ui';
 import "element-ui/lib/theme-chalk/index.css";
 import * as echarts from 'echarts';
 
+import { setCookie, getCookie, delCookie } from './global/util.js';
+
 Vue.prototype.$echarts = echarts
 Vue.prototype.$axios = axios;
+Vue.prototype.$cookie = { setCookie, getCookie, delCookie };
 axios.defaults.baseURL = '/api';
 axios.defaults.withCredentials = true;
 Vue.config.productionTip = false;

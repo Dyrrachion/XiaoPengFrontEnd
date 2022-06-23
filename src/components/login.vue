@@ -23,7 +23,6 @@
 
 <script>
 import axios from "axios";
-import global from "./global";
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 axios.defaults.headers.get['Content-Type'] = 'application/x-www-form-urlencoded';
 export default {
@@ -49,10 +48,8 @@ export default {
     doLogin() {
       if (!this.user.username) {
         this.$message.error("请输入用户名！");
-        return;
       } else if (!this.user.password) {
         this.$message.error("请输入密码！");
-        return;
       } else {
         let fd = new FormData();
         fd.append("username",this.user.username);
@@ -70,6 +67,8 @@ export default {
           .then(res => {
             // console.log("输出response.data.status", res.data.status);
             if (res.data.code === 200) {
+              console.log(res.data.data);
+              this.$cookie.setCookie("uid", res.data.data.token);
               this.$router.push({ path: "/main" });
             } else {
               alert("您输入的用户名或密码错误！");

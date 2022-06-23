@@ -70,7 +70,12 @@ export default {
       const param = {
         number: 5
       }
-      this.$axios.get("getQuestionList", { params: param })
+      const token = this.$cookie.getCookie("uid");
+      const header = {
+        'token': token
+      }
+      console.log(token);
+      this.$axios.get("getQuestionList", { params: param, headers: header })
         .then(res => {
           for (let i = 0; i < res.data.data.length; i++)
           {

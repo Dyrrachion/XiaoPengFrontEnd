@@ -65,7 +65,11 @@ export default {
           const param = {
             label: node.label
           }
-          this.$axios.get("/getArticle", { params: param })
+          const token = this.$cookie.getCookie("uid");
+          const header = {
+            'token': token
+          }
+          this.$axios.get("/getArticle", { params: param, headers: header })
             .then(res => {
               this.contentData = res.data.data;
               this.titleData = node.label;
@@ -84,7 +88,11 @@ export default {
           const param = {
             label: node.label
           }
-          this.$axios.get("/getArticleList", { params: param })
+          const token = this.$cookie.getCookie("uid");
+          const header = {
+            'token': token
+          }
+          this.$axios.get("/getArticleList", { params: param, headers: header })
             .then(res => {
               const data = [];
               for (let i = 0; i < res.data.data.length; i++)
