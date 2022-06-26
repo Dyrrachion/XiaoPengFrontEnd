@@ -11,16 +11,17 @@
   },
   "dependencies": {
     "axios": "^0.27.2",
+    "crypto-js": "^4.1.1",
     "echarts": "^5.3.3",
     "element-ui": "^2.15.9",
-    "vue": "^2.5.2",
-    "vue-router": "^3.0.1",
-    "crypto-js": "^4.1.1",
+    "js-audio-recorder": "^1.0.7",
     "node-sass": "^7.0.1",
     "sass-loader": "^4.0.0",
     "scss": "^0.2.4",
     "scss-loader": "^0.0.1",
+    "vue": "^2.5.2",
     "vue-axios": "^3.4.1",
+    "vue-router": "^3.0.1",
     "webpack-dev-server": "^2.9.7"
   },
   "devDependencies": {
