@@ -68,7 +68,8 @@ export default {
             // console.log("输出response.data.status", res.data.status);
             if (res.data.code === 200) {
               console.log(res.data.data);
-              this.$cookie.setCookie("uid", res.data.data.token);
+              this.$cookie.setCookie("token", res.data.data.token);
+              this.$cookie.setCookie("uid", res.data.data.uid);
               this.$router.push({ path: "/main" });
             } else {
               alert("您输入的用户名或密码错误！");

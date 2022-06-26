@@ -4,15 +4,28 @@
       <span style="font-size: 30px;">{{ questionData }}</span>
     </el-row>
     <el-row style="margin-top: 50px;">
-      <el-input ref="input" v-model="input" placeholder="请输入您的答案" style="width: 50%;"
+      <el-input ref="input"
+                v-if="questionList[currentQuestion - 1] && questionList[currentQuestion - 1].type === '问答'"
+                v-model="input" placeholder="请输入您的答案" style="width: 50%;"
                 type="textarea"
                 :rows="4">
       </el-input>
+      <el-radio-group v-if="questionList[currentQuestion - 1] && questionList[currentQuestion - 1].type === '单选'"
+                      v-model="choicesSelection"
+                      size="medium">
+        <el-radio v-for="choice in questionList[currentQuestion - 1].choices"
+                  :key="choice.id" :label="choice.content"
+                  border size="medium"
+                  style="display: block; font-size: 20px; width: 100vh; height: 50px;
+                  text-align: left; margin-left: 0;">
+          {{choice.content}}
+        </el-radio>
+      </el-radio-group>
     </el-row>
     <el-row style="margin-top: 50px;">
-      <span style="font-size: 20px" v-show="answerShow">答案：{{ questionAnswer }}</span>
+      <span style="font-size: 30px">{{ questionAnswer }}</span>
     </el-row>
-    <el-row style="margin-top: 250px;">
+    <el-row style="margin-top: 100px;">
       <el-button type="primary" style="width: 10%; margin-right: 200px;" @click="leftClicked()">上一题</el-button>
       <span style="font-size: 24px;">{{ currentQuestion }} / {{ allQuestion }}</span>
       <el-button type="primary" style="width: 10%; margin-left: 200px;" @click="rightClicked()">下一题</el-button>
@@ -30,13 +43,12 @@ export default {
   data() {
     return {
       input: '',
+      choicesSelection: '',
       currentQuestion: 1,
       allQuestion: 2,
       questionData: "问题内容",
-      questionAnswer: "问题答案",
+      questionAnswer: "",
       questionList: [],
-      questionAnswerList: [],
-      answerShow: false
     }
   },
   created() {
@@ -47,9 +59,8 @@ export default {
       if (this.currentQuestion > 1)
       {
         this.currentQuestion--;
-        this.questionData = this.questionList[this.currentQuestion - 1];
-        this.questionAnswer = this.questionAnswerList[this.currentQuestion - 1];
-        this.answerShow = false;
+        this.questionData = this.questionList[this.currentQuestion - 1].content;
+        this.questionAnswer = '';
         this.input = "";
       }
     },
@@ -57,9 +68,8 @@ export default {
       if (this.currentQuestion < this.allQuestion)
       {
         this.currentQuestion++;
-        this.questionData = this.questionList[this.currentQuestion - 1];
-        this.questionAnswer = this.questionAnswerList[this.currentQuestion - 1];
-        this.answerShow = false;
+        this.questionData = this.questionList[this.currentQuestion - 1].content;
+        this.questionAnswer = '';
         this.input = "";
       }
     },
@@ -68,9 +78,10 @@ export default {
     },
     getQuestionList() {
       const param = {
-        number: 5
+        selNum: 3,
+        subNum: 3
       }
-      const token = this.$cookie.getCookie("uid");
+      const token = this.$cookie.getCookie("token");
       const header = {
         'token': token
       }
@@ -79,21 +90,38 @@ export default {
         .then(res => {
           for (let i = 0; i < res.data.data.length; i++)
           {
-            this.questionList.push(res.data.data[i].content);
-            this.questionAnswerList.push(res.data.data[i].answer);
+            const question = {
+              content: res.data.data[i].content,
+              answer: res.data.data[i].answer,
+              type: res.data.data[i].type,
+              choices: res.data.data[i].choices
+            }
+            this.questionList.push(question);
           }
+          console.log(this.questionList);
           this.allQuestion = this.questionList.length;
-          this.questionData = this.questionList[0];
-          this.questionAnswer = this.questionAnswerList[0];
+          this.questionData = this.questionList[0].content;
         });
     },
     printAnswer() {
-      this.answerShow = true;
+      if (this.questionList[this.currentQuestion - 1].type === '单选')
+      {
+        console.log(true);
+        let answerIndex = parseInt(this.questionList[this.currentQuestion - 1].answer);
+        this.questionAnswer = "答案：" + this.questionList[this.currentQuestion - 1].choices[answerIndex].content;
+      }
+      else
+      {
+        console.log(false);
+        this.questionAnswer = "答案：" + this.questionList[this.currentQuestion - 1].answer;
+      }
     }
   }
 }
 </script>
 
 <style scoped>
-
+  .el-radio >>> .el-radio__input {
+    display: none !important;
+  }
 </style>

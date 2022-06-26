@@ -20,6 +20,8 @@ export default {
       if (command === 'signOut')
       {
         this.$cookie.delCookie("uid");
+        this.$cookie.delCookie("token");
+        this.$message.info("已注销");
         this.$router.push('/login');
       }
     }

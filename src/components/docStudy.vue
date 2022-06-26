@@ -65,7 +65,7 @@ export default {
           const param = {
             label: node.label
           }
-          const token = this.$cookie.getCookie("uid");
+          const token = this.$cookie.getCookie("token");
           const header = {
             'token': token
           }
@@ -88,7 +88,7 @@ export default {
           const param = {
             label: node.label
           }
-          const token = this.$cookie.getCookie("uid");
+          const token = this.$cookie.getCookie("token");
           const header = {
             'token': token
           }
