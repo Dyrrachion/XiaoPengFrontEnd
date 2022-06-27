@@ -1,22 +1,23 @@
 <template>
   <el-row style="width: 100%; height: 100%;">
-    <el-col :span="4" style="height: 30%; border-style: solid; border-radius: 10px;">
+    <el-col :span="4" style="height: 30%; padding: 15px; margin: 10px;">
+      <span style="font-weight: bold">索引</span>
       <el-tree  node-key="id"
                 icon-class="el-icon-arrow-right"
                 lazy
                 :props="defaultProps"
                 @node-click="handleNodeClick"
                 :load="load"
-                style="margin: 10px;">
+                style="margin-top: 15px;">
       </el-tree>
     </el-col>
     <el-col :span="20" style="height: 100%;">
       <el-container>
-        <el-header style="font-size: 24px; text-align: center; margin-top: 15px;">
+        <el-header style="font-size: 30px; text-align: center; margin-top: 30px; font-weight: bolder">
           <span>{{ titleData }}</span>
         </el-header>
-        <el-main style="font-size: 18px; text-align: left;">
-          <span style="margin: 30px;">{{ contentData }}</span>
+        <el-main style="font-size: 18px; text-align: left; padding-left: 100px; padding-right: 100px;">
+          <span>{{ contentData }}</span>
         </el-main>
       </el-container>
     </el-col>

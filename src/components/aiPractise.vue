@@ -7,17 +7,18 @@
           <img src="" alt class="logo" />
           <span class="title-hn">智能情景训练</span>
         </div>
-        <div id="content" class="content" style="height: 70%">
+        <div id="content" class="content" style="height: 75%">
           <p>用户走进了展览大厅.....</p>
           <div style="padding: 20px;">
             <audio ref="audio" :src="audioSrc"></audio>
           </div>
           <div v-for="(item, index) in info" :key="index">
             <div class="info_l" v-if="item.type === 'rightinfo'">
+
               <div class="con_r con_text">
                 <span class="con_l">
                  <div >
-                  <el-button v-if="!item.state" type="primary" @click="handlePlay(index)" >播放录音</el-button>
+                  <el-button  type="primary" @click="handlePlay(index)" >播放录音</el-button>
                  </div>
                   {{item.content}}
                 </span>
@@ -30,49 +31,43 @@
 
             </div>
 
-            <div class="info_r info_default" v-if="item.type == 'leftinfo'" style="width:100%;float:left " >
+            <div class="info_r info_default" v-if="item.type === 'leftinfo'" style="width:100%;float:left " >
 
-              <span class="circle circle_r"></span>
+              <span class="circle circle_r">
+              </span>
 
               <div class="con_r con_text"  style="float:left ">
-
-                <div v-for="(item2,index) in item.question" :key="index" >
-
-                </div>
-
+               {{item.content}}
               </div>
 
               <div class="time_r" style="float: left">{{item.time}}</div>
-         </div>
-
+           </div>
           </div>
+          <el-button v-if="count===3" type="text" @click="checkscore">训练已结束，点击查看得分</el-button>
         </div>
+
+
 
         <div class="setproblem" >
 
-        <div>
 
-          <textarea
-            placeholder="请输入您的回答..."
-            style="height: 68px; width: 85%;float:left;resize:none;padding-right:80px;outline: none;border-color:#ccc;border-radius:5px;"
-            id="text"
-            v-model="customerText"
-            @keyup.enter="sentMsg()"
-          >
-          </textarea>
-          <button @click="sentMsg()" class="setproblems" style="float: left">
-            <span style="vertical-align: 4px;">发 送</span>
-          </button>
-          </div>
+         <div>
+           <button @click="sentMsg()" class="setproblems" style="float: right">
+             <span style="vertical-align: 4px;">发 送</span>
+           </button>
+         </div>
+
         </div>
-
         <div style="font-size:14px"  >
+
           <i class="el-icon-mic" style="font-size: 25px"></i>
-         <el-button type="primary" @click="handleStart">开始录音</el-button>
-         <el-button type="warning" @click="handleStop">停止录音</el-button>
+          <el-button type="primary" @click="handleStart">开始录音</el-button>
+          <el-button type="warning" @click="handleStop">停止录音</el-button>
           <el-button type="error" @click="handleDestroy">删除录音</el-button>
           录音时长：{{ recorder && recorder.duration.toFixed(4) }}
         </div>
+
+
       </div>
 
     </div>
@@ -87,7 +82,6 @@ export default {
   computed: {},
   data() {
     return {
-      customerText: "",
       info: [
         {},
       ],
@@ -107,6 +101,9 @@ export default {
       playTime: 0,
       audioSrc: '',
       recordList:[],
+      count:0,
+      score:0,
+      defaultstate:3,
 
     };
   },
@@ -121,12 +118,45 @@ export default {
   },
   watch: {},
   methods: {
+    //查看成绩
+    checkscore(){
+      console.log("checkscore")
+      this.getscore();
+      this.$alert('你的得分是:'+this.score, '训练得分', {
+        confirmButtonText: '确定',
+        callback: action => {
+          this.$message({
+            type: 'info',
+            message: `action: ${ action }`
+          });
+        }
+      });
+    },
+    //获取的分接口
+    getscore(){
+
+      //通过axios get获取得分
+
+      this.score=30;
+    },
+
+    //checkcount
+    checkcount(){
+      if(this.count>=this.defaultstate)
+      {
+        return true;
+      }
+      return false;
+    },
     // 用户发送消息
     sentMsg() {
+       if(this.checkcount())
+       {
+         return 0;
+       }
        clearTimeout(this.timer);
        this.showTimer();
-       let text = this.customerText.trim();
-       if (text == "") {
+
         if (this.recorder == null || this.recorder.duration === 0) {
           this.$message({
             message: '请先录音',
@@ -146,40 +176,32 @@ export default {
         const fileOfBlob = new File([newbolb], new Date().getTime() + '.wav')
         formData.append('file', fileOfBlob)
         const url = window.URL.createObjectURL(fileOfBlob)
-        this.src = url;
+        console.log(url);
         //发送语音和文字消息
-        text=this.gettext()
-        // const axios = require('axios')
-        // axios.post(url, formData).then(res => {
-        //   console.log(res.data.data[0].url)
-        // })
+        let text =this.gettext();
+
+         // const axios = require('axios')/8
+         // axios.post('http://localhost:9990', formData).then(res => {
+         //   console.log(res.data.data[0].url)
+         //
+         // })
 
 
         var obj = {
           type: "rightinfo",
           time: this.getTodayTime(),
-          state:false,
           content:text,
-          src:url,
 
         };
         this.info.push(obj);
-        //顾客回答
-        this.appendRobotMsg(this.customerText);
-        this.customerText = "";
-      } else {
-        var obj = {
-          type: "rightinfo",
-          state:true,
-          time: this.getTodayTime(),
-          content: text,
+        this.count+=1;
+        this.recorder.destroy();
+        //顾客提问
+        if(!this.checkcount())
+        {
+          this.appendRobotMsg(text);
+        }
 
-        };
-        this.info.push(obj);
-        this.appendRobotMsg(this.customerText);
-        this.customerText = "";
-      }
-      ;
     },
     // 机器人回答消息
     appendRobotMsg(text) {
@@ -201,52 +223,9 @@ export default {
       //   var contentHeight = document.getElementById("content");
       //   contentHeight.scrollTop = contentHeight.scrollHeight;
       // });
-    sentMsgById(val, id) {
-      clearTimeout(this.timer);
-      this.showTimer();
-
-      let robotById = this.robotAnswer.filter((item) => {
-        return item.id == id;
-      });
-      let obj_l = {
-        type: "leftinfo",
-        time: this.getTodayTime(),
-        name: "robot",
-        content: robotById[0].content,
-        question: [],
-      };
-      let obj_r = {
-        type: "rightinfo",
-        time: this.getTodayTime(),
-        name: "robot",
-        content: val,
-        question: [],
-      };
-      this.info.push(obj_r);
-      this.info.push(obj_l);
-      this.$nextTick(() => {
-        var contentHeight = document.getElementById("content");
-        contentHeight.scrollTop = contentHeight.scrollHeight;
-      });
-    },
-    // 结束语
-    endMsg() {
-      let happyEnding = {
-        type: "leftinfo",
-        time: this.getTodayTime(),
-        content: "退下吧",
-        question: [],
-      };
-      this.info.push(happyEnding);
-      this.$nextTick(() => {
-        var contentHeight = document.getElementById("content");
-        contentHeight.scrollTop = contentHeight.scrollHeight;
-      });
-
-    },
 
     showTimer() {
-      this.timer = setTimeout(this.endMsg, 1000 * 60);
+      this.timer = setTimeout( 1000 * 60);
     },
     getTodayTime() {
       // 获取当前时间
@@ -277,6 +256,7 @@ export default {
         seconds;
       return time;
     },
+    //
     gettext(){
       const arr = ['happy','sad','normal']
       this.mood = arr[Math.floor(Math.random()*3)]
@@ -286,6 +266,10 @@ export default {
 
     //开始录音
     handleStart() {
+      if(this.checkcount())
+      {
+        return 0;
+      }
       this.recorder = new Recorder()
       Recorder.getPermission().then(() => {
         console.log('开始录音')
@@ -300,6 +284,10 @@ export default {
     },
     //停止录音
     handleStop() {
+      if(this.checkcount())
+      {
+        return 0;
+      }
       console.log('停止录音')
       this.recorder.stop();
       const blob = this.recorder.getWAVBlob();
@@ -310,7 +298,18 @@ export default {
     },
     //删除录音
     handleDestroy() {
+      if(this.checkcount())
+      {
+        return 0;
+      }
       console.log('删除')
+      if (this.recorder == null || this.recorder.duration === 0) {
+        this.$message({
+          message: '请先录音',
+          type: 'error'
+        })
+        return false
+      }
       this.recorder.destroy() // 毁实例
       this.recordList.pop();
       this.timer = null
@@ -332,11 +331,6 @@ export default {
       }, 100)
 
 
-
-    },
-    mounted() {
-    },
-    destroyed() {
 
     },
   }

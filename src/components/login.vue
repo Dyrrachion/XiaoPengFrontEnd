@@ -8,7 +8,8 @@
           <el-input type="text" v-model="user.username" prefix-icon="el-icon-user"></el-input>
         </el-form-item>
         <el-form-item id="password" prop="password" style="width: 80%; display: inline-block">
-          <el-input type="password" v-model="user.password" show-password prefix-icon="el-icon-lock"></el-input>
+          <el-input type="password" v-model="user.password" show-password prefix-icon="el-icon-lock"
+                    @keyup.enter.native="doLogin()"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="doLogin()" style="width: 80%;">登 录</el-button>

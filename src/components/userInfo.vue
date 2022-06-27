@@ -49,15 +49,9 @@ export default {
   data() {
     return {
       myChart: '',
-      opinionData2: [
-        {value: 1, name: '车型了解度', itemStyle: 'red'},
-        {value: 45, name: '沟通能力', itemStyle: '#1FC48D'},
-        {value: 3, name: '营销技能', itemStyle: '#6DC8EC'},
-        {value: 3, name: '其他', itemStyle: '#3F8FFF'}
-      ],
-
       myChart3: '',
       opinion3: ['文档学习', '自我学习','人机对战','其他'],
+
       opinionData3: [
         {value: 12, name: '文档学习', itemStyle: 'red'},
         {value: 37, name: '自我学习', itemStyle: '#1ab394'},
@@ -121,11 +115,23 @@ export default {
                 return colorList[params.dataIndex]
               }
             },
-            data: this.opinionData2
+            data: this.getskillinfo()
           }
         ]
       })
     },
+    //获取技能掌握情况
+    getskillinfo(){
+
+      //test case
+      return [
+        {value: 1, name: '车型了解度', itemStyle: 'red'},
+        {value: 45, name: '沟通能力', itemStyle: '#1FC48D'},
+        {value: 3, name: '营销技能', itemStyle: '#6DC8EC'},
+        {value: 3, name: '其他', itemStyle: '#3F8FFF'}
+      ]
+    },
+
     drawLine1() {
       // 基于准备好的dom，初始化echarts实例
       this.myChart2 = this.$echarts.init(document.getElementById('myChart2'))
@@ -167,13 +173,19 @@ export default {
         series: [
           {
             name: '综合评分',
-            data: [60, 75, 72, 80, 91],
+            data: this.getlastfivescore(),
             type: 'line'
           }
         ]
       })
 
     },
+    //返回用户最近五次的成绩
+    getlastfivescore(){
+
+      return [60,70,80,90,100]
+    },
+    //右边饼图
     drawLine2() {
       // console.log("开始画饼图")
       // 基于准备好的dom，初始化echarts实例
@@ -201,7 +213,7 @@ export default {
             type: 'pie',
             radius: '50%',
             center: ['50%', '50%'],
-            data: this.opinionData3,
+            data: this.getscoreanalyse(),
             itemStyle: {
               emphasis: {
                 shadowBlur: 10,
@@ -219,6 +231,17 @@ export default {
       })
 
     },
+    //获取成绩分析
+    getscoreanalyse(){
+
+      //test case
+      return [
+        {value: 12, name: '文档学习', itemStyle: 'red'},
+        {value: 37, name: '自我学习', itemStyle: '#1ab394'},
+        {value: 49, name: '人机对战', itemStyle: 'blue'},
+        {value: 2, name: '其他', itemStyle: 'gren'},
+      ]
+    }
   }
 }
 </script>
