@@ -8,10 +8,14 @@
                 :props="defaultProps"
                 @node-click="handleNodeClick"
                 :load="load"
+                :show-overflow-tooltip='true'
                 style="margin-top: 15px;">
+        <div class="Node" slot-scope="{ node, data }" >
+              <span >{{node.label}}</span>
+        </div>
       </el-tree>
     </el-col>
-    <el-col :span="20" style="height: 100%;">
+    <el-col :span="19" style="height: 100%;">
       <el-container>
         <el-header style="font-size: 30px; text-align: center; margin-top: 30px; font-weight: bolder">
           <span>{{ titleData }}</span>
@@ -113,5 +117,8 @@ export default {
 </script>
 
 <style scoped>
-
+.Node{
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 </style>

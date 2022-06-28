@@ -88,7 +88,7 @@ export default {
       this.input = "";
       this.selectedChoice = -1;
       this.answerShow = false;
-      this.locked = true;
+      this.locked = false;
       this.$refs["answerTab"].$el["style"].backgroundColor = '#D1FFEE';
       this.$refs["answerTab"].$el["style"].borderColor = '#7cfc00';
     },

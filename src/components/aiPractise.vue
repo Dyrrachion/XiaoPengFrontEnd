@@ -75,6 +75,7 @@
 </template>
 <script>
 import Recorder from 'js-audio-recorder'
+import axios from "_axios@0.27.2@axios";
 
 export default {
   name: "onlineCustomer",
@@ -166,27 +167,9 @@ export default {
         }
         this.recorder.pause() // 暂停录音
         this.timer = null
-        console.log('上传录音')// 上传录音
-
-         //上传录音
-        const formData = new FormData()
-        const blob = this.recorder.getWAVBlob()// 获取wav格式音频数据
-        // 此处获取到blob对象后需要设置fileName满足当前项目上传需求，其它项目可直接传把blob作为file塞入formData
-        const newbolb = new Blob([blob], {type: 'audio/wav'})
-        const fileOfBlob = new File([newbolb], new Date().getTime() + '.wav')
-        formData.append('file', fileOfBlob)
-        const url = window.URL.createObjectURL(fileOfBlob)
-        console.log(url);
+        console.log('发送录音')// 上传录音
         //发送语音和文字消息
-        let text =this.gettext();
-
-         // const axios = require('axios')/8
-         // axios.post('http://localhost:9990', formData).then(res => {
-         //   console.log(res.data.data[0].url)
-         //
-         // })
-
-
+        let text =this.uploadaudio();
         var obj = {
           type: "rightinfo",
           time: this.getTodayTime(),
@@ -203,6 +186,32 @@ export default {
         }
 
     },
+    //上传录音
+    uploadaudio(){
+      //上传录音
+      const formData = new FormData()
+      const blob = this.recorder.getWAVBlob()// 获取wav格式音频数据
+      // 此处获取到blob对象后需要设置fileName满足当前项目上传需求，其它项目可直接传把blob作为file塞入formData
+      const newbolb = new Blob([blob], {type: 'audio/wav'})
+      const fileOfBlob = new File([newbolb], new Date().getTime() + '.wav')
+      formData.append('file', fileOfBlob)
+      formData.append('qid','300');
+      formData.append('uid', this.$cookie.getCookie('uid'));
+      formData.append('pid','1');
+      const url = window.URL.createObjectURL(fileOfBlob)
+      console.log(url);
+      const token = this.$cookie.getCookie("token");
+      const header = {
+        'token': token
+      }
+      const axios = require('axios')
+      axios.post('fileUpload', formData, { headers: header }).then(res => {
+        console.log(res)
+      })
+
+      return this.gettext()
+    },
+
     // 机器人回答消息
     appendRobotMsg(text) {
       clearTimeout(this.timer);
@@ -256,7 +265,7 @@ export default {
         seconds;
       return time;
     },
-    //
+    //测试
     gettext(){
       const arr = ['happy','sad','normal']
       this.mood = arr[Math.floor(Math.random()*3)]
