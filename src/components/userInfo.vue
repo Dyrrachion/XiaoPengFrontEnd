@@ -76,7 +76,7 @@ export default {
       this.myChart = this.$echarts.init(document.getElementById('myChart'))
       this.myChart.setOption({
         title: {
-          text: '技能掌握情况', // 主标题
+          text: '品牌了解度分析', // 主标题
           subtext: '', // 副标题
           x: 'left' // x轴方向对齐方式
         },
@@ -94,11 +94,11 @@ export default {
           align: 'left',
           x: 'right',
           y: 'bottom',
-          data: ['车型了解度', '沟通能力', '营销技能', '其他']
+          data: ['P5', 'P7', 'G3', '小鹏']
         },
         series: [
           {
-            name: '技能掌握情况',
+            name: '品牌了解度分析',
             type: 'pie',
             radius: ['50%', '70%'],
             avoidLabelOverlap: false,
@@ -120,15 +120,15 @@ export default {
         ]
       })
     },
-    //获取技能掌握情况
+    //获取品牌分析
     getskillinfo(){
 
       //test case
       return [
-        {value: 1, name: '车型了解度', itemStyle: 'red'},
-        {value: 45, name: '沟通能力', itemStyle: '#1FC48D'},
-        {value: 3, name: '营销技能', itemStyle: '#6DC8EC'},
-        {value: 3, name: '其他', itemStyle: '#3F8FFF'}
+        {value: 20, name: 'P5', itemStyle: 'red'},
+        {value: 25, name: 'P7', itemStyle: '#1FC48D'},
+        {value: 22, name: 'G3', itemStyle: '#6DC8EC'},
+        {value: 33, name: '小鹏', itemStyle: '#3F8FFF'}
       ]
     },
 
@@ -185,61 +185,59 @@ export default {
 
       return [60,70,80,90,100]
     },
+
     //右边饼图
     drawLine2() {
       // console.log("开始画饼图")
       // 基于准备好的dom，初始化echarts实例
       this.myChart3 = this.$echarts.init(document.getElementById('myChart3'))
-      // 绘制图表
-      this.myChart3.setOption({
-        title: {
-          text: '成绩分析', // 主标题
-          subtext: '', // 副标题
-          x: 'left' // x轴方向对齐方式
+      let dataMax = [
+        { name: '综合得分', max: '100' },
+        { name: '清晰性', max: '100' },
+        { name: '逻辑性', max: '100' },
+        { name: '准确性', max: '100' },
+        { name: '完整性', max: '100' },
+      ]
+      let option = {
+        //配置维度的最大值
+        title:{
+          text:"智能训练成绩分析"
         },
-        tooltip: {
-          trigger: 'item',
-          formatter: '{a} <br/>{b} : {c} ({d}%)'
-        },
-        legend: {
-          orient: 'vertical',
-
-          bottom: 'bottom',
-          data: this.opinion3
+        radar: {
+          name: {
+            show: true,
+            color: 'red',
+          },
+          //   雷达图的指示器，用来指定雷达图中的多个变量（维度）
+          indicator: dataMax,
+          shape: 'circle', //对雷达图形设置成一个圆形,可选 circle:圆形,polygon:多角形(默认)
         },
         series: [
           {
-            name: '成绩分析',
-            type: 'pie',
-            radius: '50%',
-            center: ['50%', '50%'],
-            data: this.getscoreanalyse(),
-            itemStyle: {
-              emphasis: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: 'rgba(0, 0, 0, 0.5)'
+            type: 'radar',
+            label: {
+              show: true, //显示数值
+            },
+            areaStyle: {}, //每个雷达图形成一个阴影的面积
+            data: [
+              {
+                name: '智能训练成绩分析',
+                value: this.getscoreanalyse()
               },
-              color: function (params) {
-                // 自定义颜色
-                var colorList = ['red', '#1ab394','blue','green']
-                return colorList[params.dataIndex]
-              }
-            }
-          }
-        ]
-      })
-
+            ],
+          },
+        ],
+      }
+      // 绘制图表
+      this.myChart3.setOption(option)
     },
     //获取成绩分析
     getscoreanalyse(){
 
+
       //test case
       return [
-        {value: 12, name: '文档学习', itemStyle: 'red'},
-        {value: 37, name: '自我学习', itemStyle: '#1ab394'},
-        {value: 49, name: '人机对战', itemStyle: 'blue'},
-        {value: 2, name: '其他', itemStyle: 'gren'},
+        70,80,90,85,74
       ]
     }
   }

@@ -43,7 +43,8 @@
               <div class="time_r" style="float: left">{{item.time}}</div>
            </div>
           </div>
-          <el-button v-if="count===3" type="text" @click="checkscore">训练已结束，点击查看得分</el-button>
+          <p v-if="count===3" >训练已结束，正在评分中...</p>
+          <el-button v-if="scorestate>0" type="text" @click="checkscore">评分已完成，点击查看评分</el-button>
         </div>
 
 
@@ -104,12 +105,17 @@ export default {
       recordList:[],
       count:0,
       score:0,
+      scorestate:0,
       defaultstate:3,
-
+      text:'',
+      currentQid: '',
+      questionList: [],
+      pid:'',
     };
   },
   created() {
     this.showTimer();
+    this.getPid(this.$cookie.getCookie("uid"));
     this.recorder = new Recorder({
       sampleBits: 8, // 采样位数，支持 8 或 16，默认是16
       sampleRate: 11025, // 采样率，支持 11025、16000、22050、24000、44100、48000，根据浏览器默认值，我的chrome是48000
@@ -137,8 +143,8 @@ export default {
     getscore(){
 
       //通过axios get获取得分
-
       this.score=30;
+      this.scorestate=1;
     },
 
     //checkcount
@@ -150,7 +156,7 @@ export default {
       return false;
     },
     // 用户发送消息
-    sentMsg() {
+   async sentMsg() {
        if(this.checkcount())
        {
          return 0;
@@ -169,11 +175,12 @@ export default {
         this.timer = null
         console.log('发送录音')// 上传录音
         //发送语音和文字消息
-        let text =this.uploadaudio();
+        await this.uploadaudio();
+        console.log(this.text);
         var obj = {
           type: "rightinfo",
           time: this.getTodayTime(),
-          content:text,
+          content: this.text,
 
         };
         this.info.push(obj);
@@ -182,43 +189,68 @@ export default {
         //顾客提问
         if(!this.checkcount())
         {
-          this.appendRobotMsg(text);
+          await this.appendRobotMsg();
+        }else{
+          this.getscore();
         }
 
     },
+    //获取pid
+    getPid(uid)
+    {
+      const token = this.$cookie.getCookie("token");
+      const param = {
+        uid: uid
+      }
+      const header = {
+        'token': token
+      }
+      this.$axios.get("getPid", { params: param, headers: header }).then(res=>
+      {
+        console.log(res.data.data);
+        this.pid = res.data.data;
+      })
+    },
     //上传录音
-    uploadaudio(){
+    async uploadaudio(){
       //上传录音
       const formData = new FormData()
       const blob = this.recorder.getWAVBlob()// 获取wav格式音频数据
       // 此处获取到blob对象后需要设置fileName满足当前项目上传需求，其它项目可直接传把blob作为file塞入formData
       const newbolb = new Blob([blob], {type: 'audio/wav'})
       const fileOfBlob = new File([newbolb], new Date().getTime() + '.wav')
-      formData.append('file', fileOfBlob)
-      formData.append('qid','300');
-      formData.append('uid', this.$cookie.getCookie('uid'));
-      formData.append('pid','1');
-      const url = window.URL.createObjectURL(fileOfBlob)
-      console.log(url);
       const token = this.$cookie.getCookie("token");
       const header = {
         'token': token
       }
+      const url = window.URL.createObjectURL(fileOfBlob)
+      console.log(url);
+      formData.append('file', fileOfBlob)
+      formData.append('uid', this.$cookie.getCookie('uid'));
+      formData.append('pid', this.pid)
+      if (this.count === 0)
+      {
+        formData.append('qid','399');
+      }
+      else
+      {
+        formData.append('qid', this.questionList[this.count-1].qid);
+      }
       const axios = require('axios')
-      axios.post('fileUpload', formData, { headers: header }).then(res => {
-        console.log(res)
+      await axios.post('fileUpload', formData,{headers:header}).then(res => {
+        console.log(res.data.data);
+        this.text = res.data.data;
       })
-
-      return this.gettext()
     },
 
     // 机器人回答消息
-    appendRobotMsg(text) {
+    async appendRobotMsg() {
       clearTimeout(this.timer);
       this.showTimer();
-      text = text.trim();
       //根据传来的消息从题库抽取问题
-      let answerText = "题库问题1";
+      await this.getProblem();
+      let answerText = this.questionList[this.count - 1].content;
+      console.log(answerText);
       let obj = {
           type: "leftinfo",
           time: this.getTodayTime(),
@@ -228,6 +260,23 @@ export default {
         };
         this.info.push(obj);
       },
+
+    //获取题库问题
+    async getProblem(){
+      const token = this.$cookie.getCookie("token");
+      const header = {
+        'token': token
+      }
+      await this.$axios.get("getAIQuestionList", { headers: header }).then(res=>
+      {
+        console.log(res.data.data);
+        for (let i = 0; i < res.data.data.length; i++)
+        {
+          this.questionList.push(res.data.data[i]);
+        }
+      })
+    },
+
       // this.$nextTick(() => {
       //   var contentHeight = document.getElementById("content");
       //   contentHeight.scrollTop = contentHeight.scrollHeight;
